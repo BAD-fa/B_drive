@@ -13,7 +13,7 @@
     <h3>You have uploaded {{ request.user.uploaded_size}} bytes files</h3>
     <ul>
         {% for file in files %}
-            <li><a href="{{ file.file.ulr }}" download>{{ file.name }}</a><span>-------</span>{{ file.size }} bytes<span>-------</span>{{ file.data }}</li>
+            <li><a href="{{ file.file }}" download>{{ file.name }}</a><span>-------</span>{{ file.size }} bytes</li>
             {% empty %}
             <p>No files to show</p>
         {% endfor %}

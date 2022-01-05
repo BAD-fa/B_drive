@@ -5,14 +5,23 @@ Home
 {% endblock title %}
 
 {% block header %}
-    <button type="button"><a href="{% url 'drive:login' %}">Login</a></button>
+    {% if user.is_authenticated %}
+        <button type="button"><a href="{% url 'drive:logout' %}">Logout</a></button>
+    {% else %}
+        <button type="button"><a href="{% url 'drive:login' %}">login</a></button>
+    {% endif %}
+
 {% endblock header %}
 
 {% block content %}
-    {% if request.user %}
-        <h1>Hello {{ request.user.username }}</h1>
+    {% if user.is_authenticated %}
+        <h1>Hello {{ request.user.first_name }} {{ request.user.last_name }}</h1>
         <h2>Welcome to B_Drive</h2>
         <h3>You have uploaded {{ request.user.uploaded_size}} bytes files</h3>
+        <button type="button"><a href="{% url 'drive:upload' %}">Upload</a></button>
+        <button type="button"><a href="{% url 'drive:show_my_files' %}">my_files</a></button>
+        <button type="button"><a href="{% url 'drive:show_subs_files' %}">subs_files</a></button>
+
     {% else %}
         <p>Welcome to B_Drive</p>
         <p>Please Login</p>

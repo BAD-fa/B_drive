@@ -10,10 +10,6 @@ from .models import User, File
 from .forms import SignIn, UploadForm
 
 
-def home(request):
-    return render(request, "home.html")
-
-
 class Login(View):
     form = SignIn()
     ctx = {'form': form}
@@ -24,22 +20,29 @@ class Login(View):
     def post(self, request):
         form = SignIn(request.POST)
         if form.is_valid():
+            print(6)
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             user = authenticate(email=email, password=password)
+            print(user)
             if user:
                 login(request, user)
-                return redirect(reverse('drive:home'))
+                print(8)
+                return redirect(reverse('home'))
             else:
+                print(7)
                 self.ctx['message'] = "user doesn't exist"
                 return render(request, 'drive/login.html', context=self.ctx)
+
+        else:
+            self.ctx['form'] = form
+            return render(request, 'drive/login.html', context=self.ctx)
 
 
 @method_decorator(login_required, name='dispatch')
 class Upload(FormView):
     template_name = 'drive/upload.html'
     form_class = UploadForm
-    success_url = reverse('drive:show_files')
 
     def post(self, request, *args, **kwargs):
         form_class = self.get_form_class()
@@ -52,10 +55,21 @@ class Upload(FormView):
                 size += f.size
                 name = form.cleaned_data.get('name', '')
                 if name:
-                    File.objects.create(name=name, file=f, user=user)
-
+                    fi = File.objects.create(name=name, file=f, size=f.size, user=user)
+                    for sub in form.cleaned_data.get('subscribers'):
+                        if sub == user:
+                            pass
+                        else:
+                            fi.subscribers.add(sub)
+                            fi.save()
                 else:
-                    File.objects.create(name=f.name, file=f, user=user)
+                    fi = File.objects.create(name=f.name, file=f, size=f.size, user=user)
+                    for sub in form.cleaned_data.get('subscribers'):
+                        if sub == user:
+                            pass
+                        else:
+                            fi.subscribers.add(sub)
+                            fi.save()
             user.uploaded_size += size
             user.save()
             return self.form_valid(form)
@@ -63,12 +77,25 @@ class Upload(FormView):
         else:
             return self.form_invalid(form)
 
+    def get_success_url(self):
+        return reverse('drive:show_files')
+
 
 @login_required
-def show_files(request):
+def show_my_files(request):
     if request.method == "GET":
         user = User.objects.get(email=request.user.email)
         user_files = user.files.all().values('name', 'file', 'date')
+        ctx = {'files': user_files}
+        return render(request, 'drive/files.html', context=ctx)\
+
+
+
+@login_required
+def show_subs_files(request):
+    if request.method == "GET":
+        user = User.objects.get(email=request.user.email)
+        user_files = user.subs_files.all().values('name', 'file', 'date')
         ctx = {'files': user_files}
         return render(request, 'drive/files.html', context=ctx)
 
@@ -76,4 +103,4 @@ def show_files(request):
 @login_required
 def logout(request):
     lo(request)
-    return redirect(reverse('drive:home'))
+    return redirect(reverse('home'))

@@ -1,15 +1,16 @@
 from django import forms
 
-from .models import User
+from .models import File
 
 
-class SignIn(forms.ModelForm):
+class SignIn(forms.Form):
+    email = forms.EmailField()
+    password = forms.CharField(widget=forms.PasswordInput())
+
+
+class UploadForm(forms.ModelForm):
+    files = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
 
     class Meta:
-        model = User
-        fields = ('email', 'password')
-
-
-class UploadForm(forms.Form):
-    name = forms.CharField(max_length=255)
-    files = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
+        model = File
+        fields = ('name', 'subscribers')
