@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    My-Files
+{% endblock title %}
+
+{% block header %}
+    <button type="button"><a href="{% url 'drive:logout' %}">Logout</a></button>
+    <button type="button"><a href="{% url 'home' %}">Home</a></button>
+{% endblock header %}
+
+{% block content %}
+    <h3>You have uploaded {{ request.user.uploaded_size}} bytes files</h3>
+    <ul>
+        {% for file in files %}
+            <li><a href="{{ file.file.ulr }}" download>{{ file.name }}</a><span>-------</span>{{ file.size }} bytes<span>-------</span>{{ file.data }}</li>
+            {% empty %}
+            <p>No files to show</p>
+        {% endfor %}
+    </ul>
+
+    <button type="button"><a href="{% url 'drive:upload' %}">Upload</a></button>
+
+{% endblock content %}

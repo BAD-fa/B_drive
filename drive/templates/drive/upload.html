@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Upload-file
+{% endblock title %}
+
+{% block header %}
+    <button type="button"><a href="{% url 'drive:logout' %}">Logout</a></button>
+    <button type="button"><a href="{% url 'home' %}">Home</a></button>
+{% endblock header %}
+
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Send</button>
+    </form>
+{% endblock content %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Home
+{% endblock title %}
+
+{% block header %}
+    <button type="button"><a href="{% url 'drive:login' %}">Login</a></button>
+{% endblock header %}
+
+{% block content %}
+    {% if request.user %}
+        <h1>Hello {{ request.user.username }}</h1>
+        <h2>Welcome to B_Drive</h2>
+        <h3>You have uploaded {{ request.user.uploaded_size}} bytes files</h3>
+    {% else %}
+        <p>Welcome to B_Drive</p>
+        <p>Please Login</p>
+    {% endif %}
+{% endblock content %}
